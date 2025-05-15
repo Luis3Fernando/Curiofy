@@ -19,22 +19,22 @@ enum Role {
 }
 
 model User {
-  id         Int          @id @default(autoincrement())
-  name       String?
-  email      String       @unique
-  password   String
-  role       Role         @default(USER)
+  id          String      @id @default(uuid())
+  name        String?
+  email       String      @unique
+  password    String
+  role        Role        @default(USER)
   curiosities Curiosity[]
-  logs       Log[]
+  logs        Log[]
 
-  createdAt  DateTime     @default(now()) @map("created_at")
+  createdAt   DateTime    @default(now()) @map("created_at")
 
   @@map("users")
 }
 
 model Category {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
+  id          String      @id @default(uuid())
+  name        String      @unique
   description String?
   curiosities Curiosity[]
 
@@ -42,58 +42,65 @@ model Category {
 }
 
 model Topic {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
-  description String?
+  id               String           @id @default(uuid())
+  name             String           @unique
+  description      String?
 
-  curiosityTopics CuriosityTopic[]
+  curiosityTopics  CuriosityTopic[]
 
   @@map("topics")
 }
 
 model Curiosity {
-  id          Int          @id @default(autoincrement())
-  title       String
-  content     String
-  createdAt   DateTime     @default(now()) @map("created_at")
-  updatedAt   DateTime     @updatedAt @map("updated_at")
-  user        User         @relation(fields: [userId], references: [id])
-  userId      Int
-  category    Category     @relation(fields: [categoryId], references: [id])
-  categoryId  Int
-  isApproved  Boolean      @default(false) @map("is_approved")
-  images      Image[]
-  curiosityTopics CuriosityTopic[]
+  id               String           @id @default(uuid())
+  title            String
+  content          String
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  
+  user             User             @relation(fields: [userId], references: [id])
+  userId           String
+
+  category         Category         @relation(fields: [categoryId], references: [id])
+  categoryId       String
+
+  isApproved       Boolean          @default(false) @map("is_approved")
+  
+  images           Image[]
+  curiosityTopics  CuriosityTopic[]
 
   @@map("curiosities")
 }
 
 model Image {
-  id          Int       @id @default(autoincrement())
+  id          String     @id @default(uuid())
   url         String
-  curiosity   Curiosity @relation(fields: [curiosityId], references: [id])
-  curiosityId Int
+
+  curiosity   Curiosity  @relation(fields: [curiosityId], references: [id])
+  curiosityId String
 
   @@map("images")
 }
 
 model CuriosityTopic {
-  curiosity   Curiosity @relation(fields: [curiosityId], references: [id])
-  curiosityId Int
-  topic       Topic     @relation(fields: [topicId], references: [id])
-  topicId     Int
+  curiosity   Curiosity  @relation(fields: [curiosityId], references: [id])
+  curiosityId String
+
+  topic       Topic      @relation(fields: [topicId], references: [id])
+  topicId     String
 
   @@id([curiosityId, topicId])
   @@map("curiosity_topics")
 }
 
 model Log {
-  id         Int       @id @default(autoincrement())
-  user       User      @relation(fields: [userId], references: [id])
-  userId     Int
-  action     String
-  target     String
-  createdAt  DateTime  @default(now()) @map("created_at")
+  id          String    @id @default(uuid())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+
+  action      String
+  target      String
+  createdAt   DateTime  @default(now()) @map("created_at")
 
   @@map("logs")
 }
