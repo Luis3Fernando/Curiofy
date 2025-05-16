@@ -1,11 +1,11 @@
 import {
   Injectable,
   ConflictException,
-  ForbiddenException,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { MailService } from '../services/mail.service';
+import { MailService } from '../../mail/services/mail.service';
 import { randomBytes } from 'crypto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Role } from '@prisma/client';
@@ -56,10 +56,21 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
-    if (!user) throw new ForbiddenException('Credenciales inválidas');
 
-    const pwMatches = await bcrypt.compare(dto.password, user.password);
-    if (!pwMatches) throw new ForbiddenException('Credenciales inválidas');
+    if (!user) {
+      throw new UnauthorizedException('Credenciales incorrectas');
+    }
+
+    const isPasswordValid = await bcrypt.compare(dto.password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Credenciales incorrectas');
+    }
+
+    if (!user.isVerified) {
+      throw new UnauthorizedException(
+        'Cuenta no verificada. Revisa tu correo.',
+      );
+    }
 
     const tokens = await this.getTokens(user.id, user.email, user.role);
 

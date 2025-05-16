@@ -7,8 +7,8 @@ export const mailerConfig: MailerOptions = {
     port: 587,
     secure: false,
     auth: {
-      user: 'tu-correo@gmail.com',
-      pass: 'tu-contraseña-o-otken-de-aplicacion',
+      user: 'sysaricorp@gmail.com',
+      pass: 'czzu hiyr mzan vuvx',
     },
   },
   defaults: {

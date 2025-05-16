@@ -11,10 +11,7 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       subject: 'Verifica tu cuenta',
-      template: './verify',
-      context: {
-        url,
-      },
+      html: `<p>Haz clic aquí para verificar tu cuenta:</p><a href="${url}">${url}</a>`,
     });
   }
 }
