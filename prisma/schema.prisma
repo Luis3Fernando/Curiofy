@@ -19,15 +19,19 @@ enum Role {
 }
 
 model User {
-  id          String      @id @default(uuid())
-  name        String?
-  email       String      @unique
-  password    String
-  role        Role        @default(USER)
-  curiosities Curiosity[]
-  logs        Log[]
+  id                 String      @id @default(uuid())
+  name               String?
+  email              String      @unique
+  password           String
+  role               Role        @default(USER)
+  isVerified         Boolean     @default(false) @map("is_verified")
+  verificationToken  String?     @map("verification_token")
+  refreshToken       String?     @map("refresh_token")
+  createdAt          DateTime    @default(now()) @map("created_at")
+  updatedAt          DateTime    @updatedAt @map("updated_at")
 
-  createdAt   DateTime    @default(now()) @map("created_at")
+  curiosities        Curiosity[]
+  logs               Log[]
 
   @@map("users")
 }
