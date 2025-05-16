@@ -1,8 +1,23 @@
-import { Body, Controller, Post, Get, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { RegisterDto } from '../dto/register-auth.dto';
 import { LoginDto } from '../dto/login-auth.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -22,6 +37,15 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Tokens returned' })
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('logout')
+  @ApiOperation({ summary: 'Cerrar sesión' })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Sesión cerrada exitosamente' })
+  async logout(@Req() req: any) {
+    return this.authService.logout(req.user.userId);
   }
 
   @Get('verify')

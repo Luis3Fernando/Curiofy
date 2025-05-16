@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TaskModule } from './test/task.module';
@@ -8,7 +9,16 @@ import { CuriositiesModule } from './modules/curiosities/curiosities.module';
 import { MailModule } from './modules/mail/mail.module';
 
 @Module({
-  imports: [TaskModule, UserModule, AuthModule, CuriositiesModule, MailModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    TaskModule,
+    UserModule,
+    AuthModule,
+    CuriositiesModule,
+    MailModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

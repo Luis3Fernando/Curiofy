@@ -79,6 +79,15 @@ export class AuthService {
     return tokens;
   }
 
+  async logout(userId: string) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: null },
+    });
+
+    return { message: 'Sesión cerrada exitosamente' };
+  }
+
   async verifyEmail(token: string) {
     const user = await this.prisma.user.findFirst({
       where: { verificationToken: token },
