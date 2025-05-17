@@ -1,58 +1,41 @@
-import { IsString, IsInt, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsArray, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-
-import { Category } from '@prisma/client';
-import { User } from '@prisma/client';
-import type { Topic } from '@prisma/client';
-import { Image } from '@prisma/client';
 
 export class CreateCuriosityDto {
   @IsString()
+  @IsNotEmpty()
   @ApiProperty({ example: 'How to use NestJS with Prisma?' })
   title: string;
 
+  @IsNotEmpty()
   @IsString()
   content: string;
 
-  @IsInt()
-  userId: number;
+  @IsString()
+  @IsNotEmpty()
+  categoryName: string;
 
-  @IsInt()
-  categoryId: number;
-
+  @IsArray()
+  @IsString({ each: true })
   @IsOptional()
-  @IsBoolean()
-  isApproved?: boolean;
+  topicNames?: string[];
 }
 
-export class ResponseCuriosityDto {
-  @ApiProperty()
-  id: string;
+export class UpdateCuriosityDto {
+  @IsOptional()
+  @IsString()
+  title?: string;
 
-  @ApiProperty()
-  title: string;
+  @IsOptional()
+  @IsString()
+  content?: string;
 
-  @ApiProperty()
-  content: string;
+  @IsOptional()
+  @IsString()
+  categoryName?: string;
 
-  @ApiProperty()
-  createdAt: Date;
-
-  @ApiProperty()
-  updatedAt: Date;
-
-  @ApiProperty()
-  isApproved: boolean;
-
-  @ApiProperty()
-  user: User;
-
-  @ApiProperty()
-  category: Category;
-
-  @ApiProperty({ type: [Image] })
-  images: Image[];
-
-  @ApiProperty({ type: () => [Object] })
-  curiosityTopics: Topic[];
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  topicNames?: string[];
 }
