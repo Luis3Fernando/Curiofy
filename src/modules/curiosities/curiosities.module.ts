@@ -8,6 +8,8 @@ import { TopicService } from './services/topic.service';
 import { TopicController } from './controllers/topic.controller';
 import { MailModule } from '@modules/mail/mail.module';
 import { JwtModule } from '@nestjs/jwt';
+import { CuriosityQueryService } from './services/curiosity-query.service';
+import { CuriosityQueryController } from './controllers/curiosity-query.controller';
 
 @Module({
   imports: [
@@ -16,7 +18,17 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule,
     JwtModule.register({ secret: process.env.JWT_APPROVAL_SECRET }),
   ],
-  providers: [CuriosityService, CategoryService, TopicService],
-  controllers: [CuriosityController, CategoryController, TopicController],
+  providers: [
+    CuriosityService,
+    CategoryService,
+    TopicService,
+    CuriosityQueryService,
+  ],
+  controllers: [
+    CuriosityController,
+    CategoryController,
+    TopicController,
+    CuriosityQueryController,
+  ],
 })
 export class CuriositiesModule {}
