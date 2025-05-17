@@ -1,25 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { ConfigService } from '@nestjs/config';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(config: ConfigService) {
-    const secret = config.get<string>('JWT_ACCESS_SECRET');
-    if (!secret) {
-      throw new Error(
-        'JWT_ACCESS_SECRET is not defined in environment variables',
-      );
-    }
-
+  constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: secret,
+      ignoreExpiration: false,
+      secretOrKey: process.env.JWT_ACCESS_SECRET!,
     });
   }
 
-  async validate(payload: any) {
-    return { userId: payload.sub, email: payload.email, role: payload.role };
+  async validate(payload: { sub: string; email: string; role: Role }) {
+    return {
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role,
+    };
   }
 }
