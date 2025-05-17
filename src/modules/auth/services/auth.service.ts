@@ -108,6 +108,37 @@ export class AuthService {
     return { message: 'Cuenta verificada con éxito' };
   }
 
+  async refreshToken(refreshToken: string) {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET,
+      });
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+      });
+
+      if (!user || !user.refreshToken) {
+        throw new UnauthorizedException('Acceso no autorizado');
+      }
+
+      const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
+      if (!isMatch) {
+        throw new UnauthorizedException('Token inválido');
+      }
+
+      const tokens = await this.getTokens(user.id, user.email, user.role);
+      await this.updateRefreshToken(user.id, tokens.refresh_token);
+
+      return tokens;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      throw new UnauthorizedException(
+        'Token de actualización inválido o expirado',
+      );
+    }
+  }
+
   private async getTokens(userId: string, email: string, role: Role) {
     const payload = { sub: userId, email, role };
     const [access_token, refresh_token] = await Promise.all([

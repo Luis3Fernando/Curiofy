@@ -18,6 +18,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { RefreshTokenDto } from '../dto/refresh-token.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -55,5 +56,12 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Token inválido o expirado' })
   async verifyEmail(@Query('token') token: string) {
     return this.authService.verifyEmail(token);
+  }
+
+  @Post('refresh')
+  @ApiOperation({ summary: 'Actualizar access token' })
+  @ApiResponse({ status: 200, description: 'Access token actualizado' })
+  async refresh(@Body() dto: RefreshTokenDto) {
+    return this.authService.refreshToken(dto.refreshToken);
   }
 }
