@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailService } from './services/mail.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
+    JwtModule,
+    JwtModule.register({ secret: process.env.JWT_APPROVAL_SECRET }),
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',

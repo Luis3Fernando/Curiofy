@@ -6,10 +6,18 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { CreateCuriosityDto, UpdateCuriosityDto } from '../dtos/curiosity.dto';
+import { MailService } from '@modules/mail/services/mail.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CuriosityService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly mailService: MailService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async create(dto: CreateCuriosityDto, userId: string) {
     const UserFound = await this.prismaService.user.findUnique({
@@ -66,6 +74,23 @@ export class CuriosityService {
         user: false,
       },
     });
+
+    if (UserFound.role !== 'ADMIN') {
+      const admins = await this.prismaService.user.findMany({
+        where: { role: 'ADMIN' },
+        select: { email: true },
+      });
+
+      for (const admin of admins) {
+        await this.mailService.sendApprovalRequestEmail(admin.email, {
+          id: curiosity.id,
+          title: curiosity.title,
+          content: curiosity.content,
+          category: category.name,
+          topics: topics.map((t) => t.name),
+        });
+      }
+    }
 
     return curiosity;
   }
@@ -214,5 +239,43 @@ export class CuriosityService {
     });
 
     return { message: 'Curiosidad eliminada correctamente' };
+  }
+
+  async approve(token: string) {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: this.configService.get('JWT_APPROVAL_SECRET'),
+      });
+
+      const curiosity = await this.prismaService.curiosity.findUnique({
+        where: { id: payload.curiosityId },
+      });
+
+      if (!curiosity || curiosity.isApproved) {
+        return 'Curiosidad ya fue aprobada o no existe';
+      }
+
+      await this.prismaService.curiosity.update({
+        where: { id: payload.curiosityId },
+        data: { isApproved: true },
+      });
+
+      // Notificar al autor de la curiosidad
+      const user = await this.prismaService.user.findUnique({
+        where: { id: curiosity.userId },
+      });
+
+      if (user?.email) {
+        await this.mailService.sendUserApprovalNotification(
+          user.email,
+          curiosity.title,
+        );
+      }
+
+      return 'Curiosidad aprobada exitosamente.';
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      return 'Token inválido o expirado.';
+    }
   }
 }

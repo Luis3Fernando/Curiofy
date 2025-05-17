@@ -8,6 +8,7 @@ import {
   UseGuards,
   Req,
   Param,
+  Query,
 } from '@nestjs/common';
 import { CreateCuriosityDto, UpdateCuriosityDto } from '../dtos/curiosity.dto';
 import { CuriosityService } from '../services/curiosity.service';
@@ -52,5 +53,10 @@ export class CuriosityController {
   @ApiOperation({ summary: 'Delete a curiosity by ID' })
   async delete(@Param('id') id: string, @Req() req: any) {
     return this.curiositiesService.delete(id, req.user.userId);
+  }
+
+  @Get('approve')
+  async approveCuriosity(@Query('token') token: string) {
+    return this.curiositiesService.approve(token);
   }
 }

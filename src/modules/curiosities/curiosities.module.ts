@@ -6,9 +6,16 @@ import { CuriosityService } from './services/curiosity.service';
 import { CategoryService } from './services/category.service';
 import { TopicService } from './services/topic.service';
 import { TopicController } from './controllers/topic.controller';
+import { MailModule } from '@modules/mail/mail.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [
+    PrismaModule,
+    MailModule,
+    JwtModule,
+    JwtModule.register({ secret: process.env.JWT_APPROVAL_SECRET }),
+  ],
   providers: [CuriosityService, CategoryService, TopicService],
   controllers: [CuriosityController, CategoryController, TopicController],
 })
