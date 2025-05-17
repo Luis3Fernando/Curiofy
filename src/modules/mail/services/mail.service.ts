@@ -22,7 +22,8 @@ export class MailService {
   }
 
   async sendVerificationEmail(email: string, token: string) {
-    const url = `http://localhost:3000/auth/verify?token=${token}`;
+    const frontendUrl = this.configService.get('FRONTEND_URL');
+    const url = `${frontendUrl}/auth/verify?token=${token}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -41,8 +42,9 @@ export class MailService {
       topics: string[];
     },
   ) {
+    const frontendUrl = this.configService.get('FRONTEND_URL');
     const token = this.generateApprovalToken(curiosity.id, adminEmail);
-    const approveUrl = `http://localhost:3000/curiosities/approve?token=${token}`;
+    const approveUrl = `${frontendUrl}/curiosities/approve?token=${token}`;
 
     await this.mailerService.sendMail({
       to: adminEmail,
