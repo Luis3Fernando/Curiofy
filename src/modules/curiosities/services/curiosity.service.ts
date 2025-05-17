@@ -28,6 +28,12 @@ export class CuriosityService {
       throw new NotFoundException('Acces token inválido o caducado');
     }
 
+    if (UserFound.isVerified === false) {
+      throw new ForbiddenException(
+        'No puedes crear una curiosidad hasta verificar tu cuenta',
+      );
+    }
+
     const category = await this.prismaService.category.findUnique({
       where: { name: dto.categoryName },
     });
@@ -96,6 +102,18 @@ export class CuriosityService {
   }
 
   async findAllByUser(userId: string) {
+    const UserFound = await this.prismaService.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!UserFound) {
+      throw new NotFoundException('Acces token inválido o caducado');
+    }
+    if (UserFound.isVerified === false) {
+      throw new ForbiddenException(
+        'No puedes crear una curiosidad hasta verificar tu cuenta',
+      );
+    }
     const curiosities = await this.prismaService.curiosity.findMany({
       where: {
         userId,
@@ -137,6 +155,11 @@ export class CuriosityService {
 
     if (!UserFound) {
       throw new NotFoundException('Acces token inválido o caducado');
+    }
+    if (UserFound.isVerified === false) {
+      throw new ForbiddenException(
+        'No puedes actualizar una curiosidad hasta verificar tu cuenta',
+      );
     }
     const curiosity = await this.prismaService.curiosity.findUnique({
       where: { id: curiosityId },
@@ -218,6 +241,12 @@ export class CuriosityService {
 
     if (!UserFound) {
       throw new NotFoundException('Acces token inválido o caducado');
+    }
+
+    if (UserFound.isVerified === false) {
+      throw new ForbiddenException(
+        'No puedes eliminar una curiosidad hasta verificar tu cuenta',
+      );
     }
 
     if (!curiosity) {
