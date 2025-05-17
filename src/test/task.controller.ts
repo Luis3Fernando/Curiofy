@@ -11,7 +11,9 @@ import {
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { Task } from '@prisma/client';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('test')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}

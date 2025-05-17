@@ -20,7 +20,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
 
-@ApiTags('auth')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -34,7 +34,9 @@ export class AuthController {
   }
 
   @Post('login')
-  @ApiOperation({ summary: 'Login user and get tokens' })
+  @ApiOperation({
+    summary: 'Iniciar sesión y obtener los tokens de autenticación',
+  })
   @ApiResponse({ status: 200, description: 'Tokens returned' })
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);

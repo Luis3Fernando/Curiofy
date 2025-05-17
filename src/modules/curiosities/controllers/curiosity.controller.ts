@@ -13,7 +13,12 @@ import {
 import { CreateCuriosityDto, UpdateCuriosityDto } from '../dtos/curiosity.dto';
 import { CuriosityService } from '../services/curiosity.service';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiExcludeEndpoint,
+} from '@nestjs/swagger';
 
 @ApiTags('Curiosities')
 @ApiBearerAuth()
@@ -23,7 +28,7 @@ export class CuriosityController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'Create a new curiosity' })
+  @ApiOperation({ summary: 'Crear una nueva curiosidad' })
   @ApiBearerAuth()
   async create(@Body() dto: CreateCuriosityDto, @Req() req: any) {
     return this.curiositiesService.create(dto, req.user.userId);
@@ -31,7 +36,7 @@ export class CuriosityController {
 
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'Get all curiosities from the logged-in user' })
+  @ApiOperation({ summary: 'Obtener todas las curiosidades que creaste' })
   @ApiBearerAuth()
   async getMyCuriosities(@Req() req: any) {
     return this.curiositiesService.findAllByUser(req.user.userId);
@@ -39,7 +44,7 @@ export class CuriosityController {
 
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'Update a curiosity' })
+  @ApiOperation({ summary: 'Actualizar una curiosidad' })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateCuriosityDto,
@@ -50,12 +55,13 @@ export class CuriosityController {
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'Delete a curiosity by ID' })
+  @ApiOperation({ summary: 'Eliminar una curiosidad con su ID' })
   async delete(@Param('id') id: string, @Req() req: any) {
     return this.curiositiesService.delete(id, req.user.userId);
   }
 
   @Get('approve')
+  @ApiExcludeEndpoint()
   async approveCuriosity(@Query('token') token: string) {
     return this.curiositiesService.approve(token);
   }
